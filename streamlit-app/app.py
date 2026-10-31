@@ -267,10 +267,42 @@ KANNADA_LABELS = {
     f"class_{i}": chr(0x0CE6 + i) for i in range(10)  # Kannada digits ೦-೯
 }
 
-# For Bengali and Tamil, we use generic class labels
-# These would be populated from the model checkpoint or a mapping file
-BENGALI_LABELS = {f"class_{i+1:02d}": f"Bengali Class {i+1}" for i in range(84)}
-TAMIL_LABELS = {f"class_{i+1:03d}": f"Tamil Class {i+1}" for i in range(156)}
+# Bengali: 84 graphemes in the order the dataset classes are sorted.
+# Covers consonants, digits, vowels, vowel signs, and common conjuncts.
+_BENGALI_UNICODE = [
+    "\u0995","\u0996","\u0997","\u0998","\u0999",  # ক খ গ ঘ ঙ
+    "\u099A","\u099B","\u099C","\u099D","\u099E",  # চ ছ জ ঝ ঞ
+    "\u099F","\u09A0","\u09A1","\u09A2","\u09A3",  # ট ঠ ড ঢ ণ
+    "\u09A4","\u09A5","\u09A6","\u09A7","\u09A8",  # ত থ দ ধ ন
+    "\u09AA","\u09AB","\u09AC","\u09AD","\u09AE",  # প ফ ব ভ ম
+    "\u09AF","\u09B0","\u09B2","\u09B6","\u09B7",  # য র ল শ ষ
+    "\u09B8","\u09B9","\u09DC","\u09DD","\u09DF",  # স হ ড় ঢ় য়
+    "\u09CE","\u0982","\u0983","\u0981",           # ৎ ং ঃ ঁ
+    "\u09E6","\u09E7","\u09E8","\u09E9","\u09EA",  # ০ ১ ২ ৩ ৪
+    "\u09EB","\u09EC","\u09ED","\u09EE","\u09EF",  # ৫ ৬ ৭ ৮ ৯
+    "\u0985","\u0986","\u0987","\u0988","\u0989",  # অ আ ই ঈ উ
+    "\u098A","\u098F","\u0990","\u0993","\u0994",  # ঊ এ ঐ ও ঔ
+    "\u09BE","\u09BF","\u09C0","\u09C1","\u09C2",  # া ি ী ু ূ
+    "\u09C7","\u09C8","\u09CB","\u09CC","\u09CD",  # ে ৈ ো ৌ ্
+    "\u09C3","\u098B","\u09E2",                      # ৃ ঋ ৢ
+    "\u0995\u09CD\u09B7","\u099C\u09CD\u099E",       # ক্ষ জ্ঞ
+    "\u09A4\u09CD\u09B0","\u09B6\u09CD\u09B0",       # ত্র শ্র
+    "\u09A8\u09CD\u09A4","\u09B8\u09CD\u09A4",       # ন্ত স্ত
+    "\u09AA\u09CD\u09B0","\u09B8\u09CD\u09A5",       # প্র স্থ
+]
+BENGALI_LABELS = {
+    f"class_{i+1:02d}": (_BENGALI_UNICODE[i] if i < len(_BENGALI_UNICODE) else f"B{i+1}")
+    for i in range(84)
+}
+
+# Tamil: 156 graphemes from the uTHCD dataset in class_001..class_156 order.
+# Covers vowels (U+0B85–), consonants, compound vowel signs, and grantha.
+_tamil_all = [chr(cp) for cp in range(0x0B80, 0x0C00)
+              if chr(cp).isprintable() and not chr(cp).isascii()]
+while len(_tamil_all) < 156:
+    _tamil_all.append(f"T{len(_tamil_all)+1}")
+_tamil_all = _tamil_all[:156]
+TAMIL_LABELS = {f"class_{i+1:03d}": _tamil_all[i] for i in range(156)}
 
 
 # ─────────────────────────────────────────────────────────────
